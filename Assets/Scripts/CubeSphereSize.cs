@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class CubeSphereSize : MonoBehaviour
 {
-    public CubeSphereSizeEditor csse;
-
     public enum ShapeType
     {
         None,
