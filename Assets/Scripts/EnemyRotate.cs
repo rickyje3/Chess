@@ -20,16 +20,18 @@ public class EnemyRotate : MonoBehaviour
 
                               //pivot object   axis to rotate on (Z)  Size of angle to rotate, multiplying by distance makes it faster as it gets further from player
         transform.RotateAround(player.position, new Vector3(0, 0, 1), rotationSpeed * distance * Time.deltaTime);
-        RaycastHit2D hitbox = Physics2D.CircleCast(enemy.position, 10f, Vector2.zero, 0f);
+        RaycastHit2D hitbox = Physics2D.CircleCast(enemy.position, 100f, Vector2.zero, 0f);
 
-        if (hitbox)
+        if (hitbox.collider != null)
         {
-            if(hitbox.collider.CompareTag("Player"))
+            //having issues here with the player being detected
+            if (hitbox.collider.CompareTag("Player"))
             {
                 Debug.Log("Player is in range");
-                this.gameObject.GetComponent<Renderer>(). material.color = Color.red;
-                //this.gameObject.transform.position += player.position * -1f * Time.deltaTime;
-                    
+                GameObject o;
+                (o = this.gameObject).GetComponent<Renderer>().material.color = Color.red;
+                o.transform.position += player.position * -1f * Time.deltaTime;
+
             }
         }
     }
