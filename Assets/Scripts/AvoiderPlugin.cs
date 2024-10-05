@@ -1,24 +1,26 @@
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.AI;
 
-
+namespace AvoiderPlugin
+{
     [RequireComponent(typeof(NavMeshAgent))]
-    public class Avoider : MonoBehaviour
+    public class Avoider: MonoBehaviour
     {
         //public Transform movePosition;
         public NavMeshAgent agent;
         public Transform avoidee;
         public float range = 10f;
         public bool showGizmos = true;
-        private AvoiderPlugin.PoissonDiscSampler sampler;
+        private PoissonDiscSampler sampler;
         //private bool isAvoiding = false;
 
         private void Start()
         {
             agent = GetComponent<NavMeshAgent>();
-            sampler = new AvoiderPlugin.PoissonDiscSampler(range, range, 1f); // 1f is the minimum distance between points
+            sampler = new PoissonDiscSampler(range, range, 1f); // 1f is the minimum distance between points
         }
 
         private void Update()
@@ -141,3 +143,4 @@ using UnityEngine.AI;
             }
         }
     }
+}
