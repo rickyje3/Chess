@@ -1,4 +1,7 @@
 # Reflection
+
+Directions: Adjust obstacle, start, and goal locations in the inspector and press Spacebar when you want to finalize your changes and a new path will be created.
+
 A* uses heuristics to prioritize nodes as a more efficient method that just searches between point A to point B. How it works is it will look at all possible spots on a grid that can be travelled to and it will at these points to a list.
 These points then have their distance from the previous node measured and added to another list identifying it has already been checked. Once all points have been checked, the checked list then picks the node with the least amount of
 distance from the previous node, and repeats the process again for the next node until it reaches the goal.
