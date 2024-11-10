@@ -13,6 +13,9 @@ public class InventoryManager : MonoBehaviour
 
     [Tooltip("Pick a value between 101 and 111")] 
     public int searchID;
+    public int totalValue;
+    public int minValue;
+    public int maxValue;
 
     // Start is called before the first frame update
     void Start()
@@ -20,6 +23,8 @@ public class InventoryManager : MonoBehaviour
         inventoryItems = FindObjectsOfType<InventoryItem>().ToList();
         populateInventory();
         QuickSortByValue();
+        CalculateTotalInventoryValue();
+        FilterItemsByValueRange(minValue, maxValue);
         SearchBarName();
         BinarySearch(searchID);
     }
@@ -29,7 +34,33 @@ public class InventoryManager : MonoBehaviour
         inventoryItems.Sort((item1, item2) => item1.ID.CompareTo(item2.ID));
     }
 
-    public void SearchBarName()
+    public int CalculateTotalInventoryValue()
+    { 
+        for (int i = 0; i < inventoryItems.Count; i++)
+        {
+            totalValue += inventoryItems[i].Value;
+        }
+        Debug.Log("Total Value = " + totalValue);
+        return totalValue;
+    }
+
+    public List<InventoryItem> FilterItemsByValueRange(int minValue, int maxValue)
+    {
+        List<InventoryItem> filteredItems = new List<InventoryItem>();
+
+        for (int i = 0; i < inventoryItems.Count; i++)
+        {
+            if (inventoryItems[i].Value >= minValue && inventoryItems[i].Value <= maxValue)
+            {
+                filteredItems.Add(inventoryItems[i]);
+                Debug.Log(inventoryItems[i] + "added to filtered items list");
+            }
+        }
+
+        return filteredItems;
+    }
+
+        public void SearchBarName()
     {
         InventoryItem foundItem = LinearSearchByName(searchName);
 
@@ -51,10 +82,10 @@ public class InventoryManager : MonoBehaviour
         while (left < right)
         {
             int mid = (left + right) / 2;
-            Debug.Log("The ID you're looking for is in Element: " + mid);
             if (inventoryItems[mid].ID == searchID)
             {
-                Debug.Log(searchID + " Was Found!");
+                Debug.Log("ID: " + searchID + " Was Found in Element" + mid);
+
                 return mid;
             }
             else if (inventoryItems[mid].ID < searchID)

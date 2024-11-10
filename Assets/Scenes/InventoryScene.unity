@@ -154,6 +154,9 @@ MonoBehaviour:
   inventoryItems: []
   searchName: Bow
   searchID: 105
+  totalValue: 0
+  minValue: 3000
+  maxValue: 7500
 --- !u!4 &140894533
 Transform:
   m_ObjectHideFlags: 0
