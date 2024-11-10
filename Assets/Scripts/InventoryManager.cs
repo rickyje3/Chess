@@ -19,8 +19,14 @@ public class InventoryManager : MonoBehaviour
     {
         inventoryItems = FindObjectsOfType<InventoryItem>().ToList();
         populateInventory();
+        QuickSortByValue();
         SearchBarName();
         BinarySearch(searchID);
+    }
+
+    public void QuickSortByValue()
+    {
+        inventoryItems.Sort((item1, item2) => item1.ID.CompareTo(item2.ID));
     }
 
     public void SearchBarName()
@@ -45,23 +51,21 @@ public class InventoryManager : MonoBehaviour
         while (left < right)
         {
             int mid = (left + right) / 2;
-            
-            if (searchID == mid)
+            Debug.Log("The ID you're looking for is in Element: " + mid);
+            if (inventoryItems[mid].ID == searchID)
             {
                 Debug.Log(searchID + " Was Found!");
                 return mid;
             }
-            else if (mid < searchID)
+            else if (inventoryItems[mid].ID < searchID)
             {
                 left = mid + 1;
             }
-            else if (mid > searchID)
+            else if (inventoryItems[mid].ID > searchID)
             {
                 right = mid - 1;
             }
         }
-
-        Debug.Log("Item " + searchID + " Was Not Found :(");
         return -1;
     }
 
@@ -78,14 +82,14 @@ public class InventoryManager : MonoBehaviour
 
     void populateInventory()
     {
-        for (int i = 0; i < inventoryItems.Count; i++)
+        for (int i = 0; i < 10; i++)
         {
             inventoryItems[i].ID = Random.Range(101, 111);
             string name = inventoryItems[i].Name;
             inventoryItems[i].Value = Random.Range(1, 10000);
 
             InventoryItem item = new InventoryItem(inventoryItems[i].ID, name, inventoryItems[i].Value);
-            inventoryItems.Add(item);
+            //inventoryItems.Add(item); instantiates item
             Debug.Log("Name: " + name + "  ID: " + inventoryItems[i].ID + "  Value: " + inventoryItems[i].Value);
         }
     }
