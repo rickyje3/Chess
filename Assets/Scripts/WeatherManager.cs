@@ -1,71 +1,127 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class WeatherManager: MonoBehaviour
+public class WeatherManager : MonoBehaviour
 {
-    //api key: fc91862964f1444caf7aaa2959fcc5c8
+    [Header("OpenWeatherMap API Settings")]
+    [SerializeField] private string apiKey = "YOUR_API_KEY_HERE";
 
-    private const string xmlApi = "https://api.openweathermap.org/data/2.5/weather?q=Orlando,us&mode=xml&appid=APIKEY";
-
-    [SerializeField]
-    private string apiKey = "fc91862964f1444caf7aaa2959fcc5c8"; 
-
-    public List<string> cities = new List<string> { "London", "New York", "Tokyo", "Sydney", "Cairo" };
-
-    [SerializeField]
-    private SkyboxController skyboxController; 
-
-    private const string apiUrl = "http://api.openweathermap.org/data/2.5/weather?q={0}&units=metric&appid={1}";
-
-    public IEnumerator GetWeatherJSON(string city, Action<WeatherData> callback)
+    public enum City
     {
-        string url = string.Format(apiUrl, city, apiKey);
+        Orlando,
+        London,
+        Tokyo,
+        Cairo,
+        Sydney
+    }
+
+    [Header("Weather Settings")]
+    [SerializeField] private City selectedCity = City.Orlando; // Default city
+    [SerializeField] private Material[] skyboxes; // Assign skyboxes in inspector
+    [SerializeField] private Light sun;
+
+    private const string apiUrl = "https://api.openweathermap.org/data/2.5/weather?q={0}&units=metric&appid={1}";
+    private City lastCity; // Track the last city to avoid redundant updates
+
+    private void Start()
+    {
+        lastCity = selectedCity; // Initialize the last city
+        UpdateWeather();         // Fetch weather data for the initial city
+    }
+
+    /// <summary>
+    /// Updates the weather for the currently selected city.
+    /// </summary>
+    public void UpdateWeather()
+    {
+        string cityName = selectedCity.ToString(); // Convert enum to string
+        string url = string.Format(apiUrl, cityName, apiKey);
+        StartCoroutine(CallAPI(url, OnWeatherDataLoaded));
+    }
+
+    private IEnumerator CallAPI(string url, Action<string> callback)
+    {
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             yield return request.SendWebRequest();
-
             if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
             {
-                Debug.LogError($"Error fetching weather data: {request.error}");
+                Debug.LogError($"Error: {request.error}");
             }
             else
             {
-                string json = request.downloadHandler.text;
-                WeatherData data = JsonUtility.FromJson<WeatherData>(json);
-                callback?.Invoke(data);
+                callback(request.downloadHandler.text);
             }
         }
     }
 
-    public void UpdateWeather(string city)
+    private void OnWeatherDataLoaded(string data)
     {
-        StartCoroutine(GetWeatherJSON(city, data =>
+        Debug.Log(data);
+
+        WeatherResponse response = JsonUtility.FromJson<WeatherResponse>(data);
+
+        AdjustScene(response);
+    }
+
+    private void AdjustScene(WeatherResponse response)
+    {
+        string weatherMain = response.weather[0].main.ToLower();
+        Debug.Log($"Weather: {weatherMain}, Temp: {response.main.temp}°C");
+
+        // Change skybox
+        if (weatherMain.Contains("clear")) RenderSettings.skybox = skyboxes[0];
+        else if (weatherMain.Contains("rain")) RenderSettings.skybox = skyboxes[1];
+        else if (weatherMain.Contains("snow")) RenderSettings.skybox = skyboxes[2];
+        else if (weatherMain.Contains("clouds")) RenderSettings.skybox = skyboxes[3];
+        else RenderSettings.skybox = skyboxes[0]; // Default/Cloudy
+
+        // Adjust sun properties
+        if (weatherMain.Contains("night"))
         {
-            Debug.Log($"Weather in {city}: {data.weather[0].description}, Temp: {data.main.temp}°C");
-            skyboxController.UpdateSkybox(data);
-        }));
+            sun.intensity = 0.2f;
+            sun.color = Color.blue;
+        }
+        else
+        {
+            sun.intensity = 1.0f;
+            sun.color = Color.white;
+        }
+    }
+
+    /// <summary>
+    /// Automatically trigger weather updates when the selected city changes in the Inspector.
+    /// </summary>
+    private void OnValidate()
+    {
+        if (!Application.isPlaying) return;
+
+        if (selectedCity != lastCity) // Only update if the city has changed
+        {
+            lastCity = selectedCity; // Update the tracked city
+            UpdateWeather();
+        }
     }
 }
 
 [Serializable]
-public class WeatherData
+public class WeatherResponse
 {
-    public List<WeatherCondition> weather;
-    public MainWeatherData main;
+    public Weather[] weather;
+    public Main main;
 }
 
 [Serializable]
-public class WeatherCondition
+public class Weather
 {
+    public string main;
     public string description;
 }
 
 [Serializable]
-public class MainWeatherData
+public class Main
 {
     public float temp;
 }
-
