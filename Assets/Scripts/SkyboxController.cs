@@ -11,7 +11,7 @@ public class SkyboxController : MonoBehaviour
     public Material cloudy;
     public Light sun;
 
-    public void UpdateSkybox(WeatherData data)
+    /*public void UpdateSkybox(WeatherData data)
     {
         string weatherDescription = data.weather[0].description.ToLower();
 
@@ -47,6 +47,6 @@ public class SkyboxController : MonoBehaviour
 
             DynamicGI.UpdateEnvironment(); // Updates the lighting
         }
-    }
+    }*/
 }
 

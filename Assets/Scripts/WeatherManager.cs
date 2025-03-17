@@ -17,6 +17,7 @@ public class WeatherManager : MonoBehaviour
         Sydney
     }
 
+
     [Header("Weather Settings")]
     [SerializeField] private City selectedCity = City.Orlando; // Default city
     [SerializeField] private Material[] skyboxes; // Assign skyboxes in inspector
@@ -28,13 +29,13 @@ public class WeatherManager : MonoBehaviour
     private void Start()
     {
         lastCity = selectedCity; // Initialize the last city
-        UpdateWeather();         // Fetch weather data for the initial city
+        UpdateWeather(selectedCity);         // Fetch weather data for the initial city
     }
 
     /// <summary>
     /// Updates the weather for the currently selected city.
     /// </summary>
-    public void UpdateWeather()
+    public void UpdateWeather(City selectedCity)
     {
         string cityName = selectedCity.ToString(); // Convert enum to string
         string url = string.Format(apiUrl, cityName, apiKey);
@@ -101,7 +102,7 @@ public class WeatherManager : MonoBehaviour
         if (selectedCity != lastCity) // Only update if the city has changed
         {
             lastCity = selectedCity; // Update the tracked city
-            UpdateWeather();
+            UpdateWeather(selectedCity);
         }
     }
 }
